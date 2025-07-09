@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod/v4'
+import { useCreateRoom } from '@/http/use-create-room'
 import { Button } from './ui/button'
 import {
   Card,
@@ -28,6 +29,8 @@ const createRoomFormSchema = z.object({
 type CreateRoomFormData = z.infer<typeof createRoomFormSchema>
 
 export function CreateRoomForm() {
+  const { mutateAsync: createRoom } = useCreateRoom()
+
   const createRoomForm = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomFormSchema),
     defaultValues: {
@@ -36,9 +39,11 @@ export function CreateRoomForm() {
     },
   })
 
-  function handleCreateRoom(data: CreateRoomFormData) {
-    // biome-ignore lint/suspicious/noConsole: tu é chato demais biome, mas obrigado por ser assim
-    console.log(data)
+  async function handleCreateRoom({ name, description }: CreateRoomFormData) {
+    await createRoom({
+      name,
+      description,
+    })
   }
 
   return (
