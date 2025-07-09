@@ -44,6 +44,7 @@ export function CreateRoomForm() {
       name,
       description,
     })
+    createRoomForm.reset()
   }
 
   return (
