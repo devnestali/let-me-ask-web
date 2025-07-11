@@ -32,18 +32,51 @@ export function useCreateQuestion(roomId: string) {
 
       const questionsArray = questions ?? []
 
+      const newQuestion = {
+        id: crypto.randomUUID(),
+        question,
+        answer: null,
+        createdAt: new Date().toISOString(),
+      }
+
       queryClient.setQueryData<GetRoomQuestionResponse>(
         ['get-questions', roomId],
-        [
-          {
-            id: crypto.randomUUID(),
-            question,
-            answer: null,
-            createdAt: new Date().toISOString(),
-          },
-          ...questionsArray,
-        ]
+        [newQuestion, ...questionsArray]
       )
+
+      return { newQuestion, questions }
+    },
+
+    onSuccess(data, _variables, context) {
+      queryClient.setQueryData<GetRoomQuestionResponse>(
+        ['get-questions', roomId],
+        (questions) => {
+          if (!(questions && context.newQuestion)) {
+            return questions
+          }
+
+          return questions.map((question) => {
+            if (question.id === context.newQuestion.id) {
+              return {
+                ...context.newQuestion,
+                id: data.questionId,
+                answer: data.answer,
+              }
+            }
+
+            return question
+          })
+        }
+      )
+    },
+
+    onError(_error, _variables, context) {
+      if (context?.questions) {
+        queryClient.setQueryData<GetRoomQuestionResponse>(
+          ['get-questions', roomId],
+          context.questions
+        )
+      }
     },
   })
 }
