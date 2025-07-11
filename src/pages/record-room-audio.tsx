@@ -36,6 +36,7 @@ export function RecordRoomAudio() {
 
     const result = await response.json()
 
+    // biome-ignore lint/suspicious/noConsole: chato
     console.log(result)
   }
 

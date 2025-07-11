@@ -49,6 +49,8 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
     form.reset()
   }
 
+  const { isSubmitting } = form.formState
+
   return (
     <Card>
       <CardHeader>
@@ -72,6 +74,7 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
                   <FormControl>
                     <Textarea
                       className="min-h-[100px]"
+                      disabled={isSubmitting}
                       placeholder="Que te gustaría saber?"
                       {...field}
                     />
@@ -81,7 +84,11 @@ export function QuestionForm({ roomId }: QuestionFormProps) {
               )}
             />
 
-            <Button className="cursor-pointer" type="submit">
+            <Button
+              className="cursor-pointer disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+              type="submit"
+            >
               Enviar pregunta
             </Button>
           </form>
