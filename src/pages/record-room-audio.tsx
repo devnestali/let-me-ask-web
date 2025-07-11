@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: al empezar gravación y terminar grabación */
 import { useRef, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -16,7 +17,7 @@ export function RecordRoomAudio() {
   const [isRecording, setIsRecording] = useState(false)
   const recorder = useRef<MediaRecorder | null>(null)
   const params = useParams<RecordRoomParams>()
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout>(null)
 
   if (!params.roomId) {
     return <Navigate replace to="/" />
@@ -53,12 +54,10 @@ export function RecordRoomAudio() {
     }
 
     recorder.current.onstart = () => {
-      // biome-ignore lint/suspicious/noConsole: al empezar gravación
       console.log('Grabacion Iniciada.')
     }
 
     recorder.current.onstop = () => {
-      // biome-ignore lint/suspicious/noConsole: al parar gravación
       console.log('Grabación encerrada')
     }
 
@@ -71,6 +70,7 @@ export function RecordRoomAudio() {
     }
 
     setIsRecording(true)
+    toast('Grabación Iniciada.')
 
     const audio = await navigator.mediaDevices.getUserMedia({
       audio: {
@@ -84,14 +84,21 @@ export function RecordRoomAudio() {
 
     intervalRef.current = setInterval(() => {
       recorder.current?.stop()
+
+      createRecorder(audio)
     }, 5000)
   }
 
   function stopRecording() {
     setIsRecording(false)
+    toast('Grabación terminada.')
 
     if (recorder.current && recorder.current.state !== 'inactive') {
       recorder.current.stop()
+    }
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
     }
   }
 
