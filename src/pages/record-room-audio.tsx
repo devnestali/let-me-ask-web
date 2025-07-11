@@ -16,6 +16,7 @@ export function RecordRoomAudio() {
   const [isRecording, setIsRecording] = useState(false)
   const recorder = useRef<MediaRecorder | null>(null)
   const params = useParams<RecordRoomParams>()
+  const intervalRef = useRef<NodeJS.Timeout>()
 
   if (!params.roomId) {
     return <Navigate replace to="/" />
@@ -36,8 +37,32 @@ export function RecordRoomAudio() {
 
     const result = await response.json()
 
-    // biome-ignore lint/suspicious/noConsole: chato
-    console.log(result)
+    return result
+  }
+
+  function createRecorder(audio: MediaStream) {
+    recorder.current = new MediaRecorder(audio, {
+      mimeType: 'audio/webm',
+      audioBitsPerSecond: 64_000,
+    })
+
+    recorder.current.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        uploadAudio(event.data)
+      }
+    }
+
+    recorder.current.onstart = () => {
+      // biome-ignore lint/suspicious/noConsole: al empezar gravación
+      console.log('Grabacion Iniciada.')
+    }
+
+    recorder.current.onstop = () => {
+      // biome-ignore lint/suspicious/noConsole: al parar gravación
+      console.log('Grabación encerrada')
+    }
+
+    recorder.current.start()
   }
 
   async function startRecording() {
@@ -55,28 +80,11 @@ export function RecordRoomAudio() {
       },
     })
 
-    recorder.current = new MediaRecorder(audio, {
-      mimeType: 'audio/webm',
-      audioBitsPerSecond: 64_000,
-    })
+    createRecorder(audio)
 
-    recorder.current.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        uploadAudio(event.data)
-      }
-    }
-
-    recorder.current.onstart = () => {
-      // biome-ignore lint/suspicious/noConsole: ao iniciar a gravacao
-      console.log('Grabacion Iniciada.')
-    }
-
-    recorder.current.onstop = () => {
-      // biome-ignore lint/suspicious/noConsole: ao parar a gravacao
-      console.log('Grabación encerrada')
-    }
-
-    recorder.current.start()
+    intervalRef.current = setInterval(() => {
+      recorder.current?.stop()
+    }, 5000)
   }
 
   function stopRecording() {
