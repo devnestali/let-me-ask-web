@@ -6,7 +6,7 @@ Let Me Ask is an AI-powered question-and-answer application where the user submi
 
 ## 🤖 PROTOTYPE
 
-![prototipe](./assets/let-me-ask-prototipe.gif)
+![prototipe](https://github.com/user-attachments/assets/78b78fae-31dc-4ac8-8d33-0e60757cc96f)
 
 ## 📒 Features
 
