@@ -1,4 +1,4 @@
-# 🤖 Let me ask - API
+# 🤖 Let me ask - Web
 
 Let Me Ask is an AI-powered question-and-answer application where the user submits audio through the computer’s microphone. The audio content is stored in memory and used to generate responses for future questions based on that content. The system operates with independent rooms, each containing its own recorded content without mixing between them.
 
